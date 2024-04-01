@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid()) @map("_id")
+  name      String?
+  city      String?
+  street    String?
+  code      String?
+  email     String   @unique
+  password  String?
+  createdAt DateTime @default(now())
+  admin     Boolean  @default(false)
+
+  Session UserSession[]
+}
+
+
+
+model UserSession {
+  id        String      @id @default(cuid()) @map("_id")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Size {
+  id        String  @id @default(cuid()) @map("_id")
+  name      String
+  sizePrice Float
+  Item      Item?   @relation(fields: [itemId], references: [id])
+  itemId    String?
+}
+model Category {
+  id    String @id @default(cuid()) @map("_id")
+  name  String
+  items Item[]
+}
+
+
+model Item {
+  id         String    @id @default(cuid()) @map("_id")
+  name       String
+  desctption String
+  image      String
+  price      Float
+  sizes      Size[]
+  Category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+}
+
+model Order {
+  id          String    @id @default(cuid()) @map("_id")
+  username   String
+  street String?
+  code  String?
+  city        String?
+  cartProducts Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
